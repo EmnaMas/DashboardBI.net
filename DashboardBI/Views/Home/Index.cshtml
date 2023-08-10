@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard BI - Statistiques par Genre et par Age</title>
+    <link href="https://kendo.cdn.telerik.com/themes/6.6.0/default/default-main.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2022.2.616/js/kendo.all.min.js"></script>
+    <style>
+        /* Définir le style pour chaque chart */
+        .dashboard-chart {
+            width: 33%;
+            float: left;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tableau de bord BI</h1>
+    <div>
+        <label for="genderFilter">Filtre par Genre:</label>
+        <select id="genderFilter" name="genderFilter">
+            <option value="">Tous</option>
+            <option value="f">Féminin</option>
+            <option value="m">Masculin</option>
+            <option value="unknown">Inconnu</option>
+        </select>
+    </div>
+
+    <!-- Row 1 -->
+    <div class="dashboard-chart">
+        <div id="chartGender"></div>
+        <pre>@ViewData["GenderData"]</pre>
+    </div>
+    <div class="dashboard-chart">
+        <div id="chartAge"></div>
+        <pre>@ViewData["AgeData"]</pre>
+        <pre id="filteredAgeData"></pre>
+    </div>
+    <div class="dashboard-chart">
+        <div id="categoryChart"></div>
+        <pre>@ViewData["CategoryData"]</pre>
+    </div>
+    <!-- Row 2 -->
+    <div class="dashboard-chart">
+        <div id="chartError"></div>
+        <pre>@ViewData["ErrorData"]</pre>
+    </div>
+    <div class="dashboard-chart">
+        <div id="chartStatus"></div>
+        <pre>@ViewData["StatusData"]</pre>
+    </div>
+
+    <!-- Ajouter d'autres charts ici avec le même format -->
+
+    <script>
+        $(document).ready(function () {
+            var genderDataList = @Html.Raw(ViewData["GenderData"]);
+            var ageDataList = @Html.Raw(ViewData["AgeData"]);
+            var categoryDataList = @Html.Raw(ViewData["CategoryData"]);
+            var errorDataList = @Html.Raw(ViewData["ErrorData"]);
+            var statusDataList = @Html.Raw(ViewData["StatusData"]);
+
+            // Chart pour le genre
+            $("#chartGender").kendoChart({
+                title: {
+                    position: "bottom",
+                    text: "Statistiques par Genre"
+                },
+                legend: {
+                    visible: true,
+                    position: "bottom"
+                },
+                seriesDefaults: {
+                    type: "pie",
+                    labels: {
+                        visible: true,
+                        background: "transparent",
+                        template: "#= category #: \n #= value #"
+                    }
+                },
+                series: [{
+                    data: genderDataList,
+                    categoryField: "Gender",
+                    field: "EmailCount"
+                }],
+                tooltip: {
+                    visible: true,
+                    format: "{0}"
+                }
+            });
+
+            // Chart pour l'âge en graphique en aires
+            $("#chartAge").kendoChart({
+                title: {
+                    position: "bottom",
+                    text: "Statistiques par Age"
+                },
+                legend: {
+                    visible: true,
+                    position: "bottom"
+                },
+                seriesDefaults: {
+                    type: "area", // Utiliser le type "area" pour le graphique en aires
+                    stack: true,
+                    labels: {
+                        visible: true,
+                        background: "transparent",
+                        format: "{0}"
+                    }
+                },
+                series: [{
+                    data: ageDataList, // Utilisez ageDataList au lieu de data directement
+                    categoryField: "AgeDesc",
+                    field: "EmailCount"
+                }],
+                categoryAxis: {
+                    field: "AgeDesc", // Utilisez "AgeDesc" comme champ pour l'axe des catégories
+                    labels: {
+                        rotation: "auto"
+                    }
+                },
+                tooltip: {
+                    visible: true,
+                    format: "{0}"
+                }
+            });
+
+            // Créer le graphique en anneau (donut) pour les catégories
+            $("#categoryChart").kendoChart({
+                title: {
+                    position: "bottom",
+                    text: "Statistiques par Catégorie"
+                },
+                legend: {
+                    visible: true,
+                    position: "bottom"
+                },
+                seriesDefaults: {
+                    type: "donut",
+                    startAngle: 150,
+                    holeSize: 80
+                },
+                series: [{
+                    data: categoryDataList,
+                    categoryField: "Category",
+                    field: "EmailCount"
+                }],
+                tooltip: {
+                    visible: true,
+                    format: "{0}"
+                }
+            });
+
+            // Chart pour les erreurs en graphique en zones empilées
+            $("#chartError").kendoChart({
+                title: {
+                    position: "bottom",
+                    text: "Statistiques par Erreur"
+                },
+                legend: {
+                    visible: true,
+                    position: "bottom"
+                },
+                seriesDefaults: {
+                    type: "area", // Utiliser le type "area" pour le graphique en zones empilées
+                    stack: true,
+                    labels: {
+                        visible: true,
+                        format: "{0}"
+                    }
+                },
+                series: [{
+                    data: errorDataList,
+                    categoryField: "Error",
+                    field: "EmailCount",
+                    color: "#ff0000" // Couleur du graphique en zones empilées (peut être modifiée selon vos besoins)
+                }],
+                categoryAxis: {
+                    labels: {
+                        rotation: "auto"
+                    }
+                },
+                tooltip: {
+                    visible: true,
+                    format: "{0}"
+                }
+            });
+
+            // Chart pour le statut en graphique en secteurs
+            $("#chartStatus").kendoChart({
+                title: {
+                    position: "bottom",
+                    text: "Statistiques par Statut"
+                },
+                legend: {
+                    visible: true,
+                    position: "bottom"
+                },
+                seriesDefaults: {
+                    type: "pie", // Utiliser le type "pie" pour le graphique en secteurs
+                    labels: {
+                        visible: true,
+                        background: "transparent",
+                        template: "#= category #: \n #= value #"
+                    }
+                },
+                series: [{
+                    data: statusDataList,
+                    categoryField: "StatusDesc",
+                    field: "EmailCount"
+                }],
+                tooltip: {
+                    visible: true,
+                    format: "{0}"
+                }
+            });
+
+            // Gérer le changement de valeur dans la liste déroulante de filtre
+            $("#genderFilter").change(function () {
+                var selectedGender = $(this).val();
+                // Mettre à jour le graphique Gender en utilisant la nouvelle valeur de filtre
+                updateGenderChart(selectedGender);
+            });
+
+            function updateGenderChart(genderFilter) {
+                // Utilisez AJAX pour appeler le contrôleur avec le filtre
+                $.ajax({
+                    url: '/Home/UpdateGenderChart',
+                    data: { genderFilter: genderFilter },
+                    success: function (data) {
+                        // Mettre à jour le graphique Gender avec les nouvelles données
+                        var chart = $("#chartGender").data("kendoChart");
+                        chart.options.series[0].data = data;
+                        chart.refresh();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*
+
+
+        <div>
+        <label for="filterAge">Filtrer par âge:</label>
+        <select id="filterAge">
+            <option value="">Tous les âges</option>
+            <option value="16-24">16-24</option>
+            <option value="25-34">25-34</option>
+            <option value="35-44">35-44</option>
+            <option value="45-54">45-54</option>
+            <option value="55-64">55-64</option>
+            <option value="65-74">65-74</option>
+            <option value="75+">75+</option>
+            <option value="Unknown">Inconnu</option>
+        </select>
+    </div>
+    <div>
+        <label for="filterGender">Filtrer par sexe:</label>
+        <select id="filterGender">
+            <option value="">Tous les sexes</option>
+            <option value="f">Femme</option>
+            <option value="m">Homme</option>
+            <option value="unknown">Inconnu</option>
+        </select>
+    </div>
+                // Filtrer par âge
+                $("#filterAge").change(function () {
+                    var selectedAge = $(this).val();
+                    var chartAgeUrl = "@Url.Action("GetFilteredAgeData", "Home")";
+
+                    // Utiliser AJAX pour récupérer les données filtrées depuis le serveur
+                    $.ajax({
+                        type: "POST",
+                        url: chartAgeUrl,
+                        data: { ageDesc: selectedAge },
+                        success: function (data) {
+                            // Mettre à jour le graphique d'âge avec les données filtrées
+                            var chart = $("#chartAge").data("kendoChart");
+                            chart.options.series[0].data = data;
+                            chart.refresh();
+
+                            // Mettre à jour le texte affichant les données filtrées
+                            var filteredDataText = "Données filtrées pour l'âge sélectionné: \n";
+                            for (var i = 0; i < data.length; i++) {
+                                filteredDataText += data[i].AgeDesc + ": " + data[i].EmailCount + "\n";
+                            }
+                            $("#filteredAgeData").text(filteredDataText);
+                        },
+                        error: function (error) {
+                            console.log("Une erreur est survenue lors de la récupération des données filtrées : " + error);
+                        }
+                    });
+                });
+
+
+
+
+        // Filtrer par sexe
+    $("#filterGender").change(function () {
+        var selectedGender = $(this).val();
+        var chartGenderUrl = "@Url.Action("GetFilteredGenderData", "Home")";
+
+        // Utiliser AJAX pour récupérer les données filtrées depuis le serveur
+        $.ajax({
+            type: "POST",
+            url: chartGenderUrl,
+            data: { genderId: selectedGender },
+            success: function (data) {
+                // Mettre à jour le graphique de genre avec les données filtrées
+                var chart = $("#chartGender").data("kendoChart");
+                chart.options.series[0].data = data;
+                chart.refresh();
+            },
+            error: function (error) {
+                console.log("Une erreur est survenue lors de la récupération des données filtrées : " + error);
+            }
+        });
+    });*@
