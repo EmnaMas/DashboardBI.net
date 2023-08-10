@@ -77,6 +77,6 @@ namespace DashboardBI.Models
             return genderList;
         }
 
-
+       
     }
 }

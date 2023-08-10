@@ -1,10 +1,9 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<html>
 <head>
     <title>Dashboard BI - Statistiques par Genre et par Age</title>
     <link href="https://kendo.cdn.telerik.com/themes/6.6.0/default/default-main.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2022.2.616/js/kendo.all.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/kendo.all.min.js"></script>
     <style>
         /* Définir le style pour chaque chart */
         .dashboard-chart {
@@ -17,15 +16,7 @@
 <body>
 
     <h1>Tableau de bord BI</h1>
-    <div>
-        <label for="genderFilter">Filtre par Genre:</label>
-        <select id="genderFilter" name="genderFilter">
-            <option value="">Tous</option>
-            <option value="f">Féminin</option>
-            <option value="m">Masculin</option>
-            <option value="unknown">Inconnu</option>
-        </select>
-    </div>
+
 
     <!-- Row 1 -->
     <div class="dashboard-chart">
@@ -54,14 +45,19 @@
     <!-- Ajouter d'autres charts ici avec le même format -->
 
     <script>
-        $(document).ready(function () {
-            var genderDataList = @Html.Raw(ViewData["GenderData"]);
-            var ageDataList = @Html.Raw(ViewData["AgeData"]);
-            var categoryDataList = @Html.Raw(ViewData["CategoryData"]);
-            var errorDataList = @Html.Raw(ViewData["ErrorData"]);
-            var statusDataList = @Html.Raw(ViewData["StatusData"]);
+       $(document).ready(function () {
+        var genderDataList = @Html.Raw(ViewData["GenderData"]);
+        var ageDataList = @Html.Raw(ViewData["AgeData"]);
+        var categoryDataList = @Html.Raw(ViewData["CategoryData"]);
+        var errorDataList = @Html.Raw(ViewData["ErrorData"]);
+        var statusDataList = @Html.Raw(ViewData["StatusData"]);
 
-            // Chart pour le genre
+
+
+
+
+      // Chart pour le genre
+
             $("#chartGender").kendoChart({
                 title: {
                     position: "bottom",
@@ -90,7 +86,8 @@
                 }
             });
 
-            // Chart pour l'âge en graphique en aires
+        // Chart pour l'âge en graphique en aires
+
             $("#chartAge").kendoChart({
                 title: {
                     position: "bottom",
@@ -110,12 +107,11 @@
                     }
                 },
                 series: [{
-                    data: ageDataList, // Utilisez ageDataList au lieu de data directement
+                    data: ageDataList,
                     categoryField: "AgeDesc",
                     field: "EmailCount"
                 }],
                 categoryAxis: {
-                    field: "AgeDesc", // Utilisez "AgeDesc" comme champ pour l'axe des catégories
                     labels: {
                         rotation: "auto"
                     }
@@ -126,7 +122,10 @@
                 }
             });
 
-            // Créer le graphique en anneau (donut) pour les catégories
+
+
+        // Créer le graphique en anneau (donut) pour les catégories
+
             $("#categoryChart").kendoChart({
                 title: {
                     position: "bottom",
@@ -152,92 +151,93 @@
                 }
             });
 
-            // Chart pour les erreurs en graphique en zones empilées
-            $("#chartError").kendoChart({
-                title: {
-                    position: "bottom",
-                    text: "Statistiques par Erreur"
-                },
-                legend: {
-                    visible: true,
-                    position: "bottom"
-                },
-                seriesDefaults: {
-                    type: "area", // Utiliser le type "area" pour le graphique en zones empilées
-                    stack: true,
-                    labels: {
-                        visible: true,
-                        format: "{0}"
-                    }
-                },
-                series: [{
-                    data: errorDataList,
-                    categoryField: "Error",
-                    field: "EmailCount",
-                    color: "#ff0000" // Couleur du graphique en zones empilées (peut être modifiée selon vos besoins)
-                }],
-                categoryAxis: {
-                    labels: {
-                        rotation: "auto"
-                    }
-                },
-                tooltip: {
-                    visible: true,
-                    format: "{0}"
-                }
-            });
+// Chart pour les erreurs en graphique en zones empilées
+$("#chartError").kendoChart({
+    title: {
+        position: "bottom",
+        text: "Statistiques par Erreur"
+    },
+    legend: {
+        visible: true,
+        position: "bottom"
+    },
+    seriesDefaults: {
+        type: "area", // Utiliser le type "area" pour le graphique en zones empilées
+        stack: true,
+        labels: {
+            visible: true,
+            format: "{0}"
+        }
+    },
+    series: [{
+        data: errorDataList,
+        categoryField: "Error",
+        field: "EmailCount",
+        color: "#ff0000" // Couleur du graphique en zones empilées (peut être modifiée selon vos besoins)
+    }],
+    categoryAxis: {
+        labels: {
+            rotation: "auto"
+        }
+    },
 
-            // Chart pour le statut en graphique en secteurs
-            $("#chartStatus").kendoChart({
-                title: {
-                    position: "bottom",
-                    text: "Statistiques par Statut"
-                },
-                legend: {
-                    visible: true,
-                    position: "bottom"
-                },
-                seriesDefaults: {
-                    type: "pie", // Utiliser le type "pie" pour le graphique en secteurs
-                    labels: {
-                        visible: true,
-                        background: "transparent",
-                        template: "#= category #: \n #= value #"
-                    }
-                },
-                series: [{
-                    data: statusDataList,
-                    categoryField: "StatusDesc",
-                    field: "EmailCount"
-                }],
-                tooltip: {
-                    visible: true,
-                    format: "{0}"
-                }
-            });
 
-            // Gérer le changement de valeur dans la liste déroulante de filtre
-            $("#genderFilter").change(function () {
-                var selectedGender = $(this).val();
-                // Mettre à jour le graphique Gender en utilisant la nouvelle valeur de filtre
-                updateGenderChart(selectedGender);
-            });
+    tooltip: {
+        visible: true,
+        format: "{0}"
+    }
+});
 
-            function updateGenderChart(genderFilter) {
-                // Utilisez AJAX pour appeler le contrôleur avec le filtre
-                $.ajax({
-                    url: '/Home/UpdateGenderChart',
-                    data: { genderFilter: genderFilter },
-                    success: function (data) {
-                        // Mettre à jour le graphique Gender avec les nouvelles données
-                        var chart = $("#chartGender").data("kendoChart");
-                        chart.options.series[0].data = data;
-                        chart.refresh();
-                    }
-                });
+  // Chart pour le statut en graphique en secteurs
+    $("#chartStatus").kendoChart({
+        title: {
+            position: "bottom",
+            text: "Statistiques par Statut"
+        },
+        legend: {
+            visible: true,
+            position: "bottom"
+        },
+        seriesDefaults: {
+            type: "pie", // Utiliser le type "pie" pour le graphique en secteurs
+            labels: {
+                visible: true,
+                background: "transparent",
+                template: "#= category #: \n #= value #"
             }
+        },
+        series: [{
+            data: statusDataList,
+            categoryField: "StatusDesc",
+            field: "EmailCount"
+        }],
+        tooltip: {
+            visible: true,
+            format: "{0}"
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
         });
     </script>
+
+
+
+
+
+
+
 </body>
 </html>
 

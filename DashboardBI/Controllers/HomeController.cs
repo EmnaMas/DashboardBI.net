@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+
 using DashboardBI.Models;
 using DashboardBI.Models.DashboardBI.Models;
 
 namespace DashboardBI.Controllers
 {
+
+
+
     public class HomeController : Controller
     {
+
         public ActionResult Index()
         {
             GenderModel genderModel = new GenderModel();
@@ -17,25 +24,41 @@ namespace DashboardBI.Controllers
 
             if (isDatabaseConnected)
             {
+                // Instancier le modèle genderModel
+                var genderDataList = genderModel.GetEmailsByGender("m");
+                ViewData["GenderData"] = Newtonsoft.Json.JsonConvert.SerializeObject(genderDataList);
+
+
                 // Instancier le modèle AgeModel
                 AgeModel ageModel = new AgeModel();
                 var ageDataList = ageModel.GetEmailsByAge();
                 ViewData["AgeData"] = Newtonsoft.Json.JsonConvert.SerializeObject(ageDataList);
+
+
 
                 // Instancier le modèle CategoryModel
                 CategoryModel categoryModel = new CategoryModel();
                 var categoryDataList = categoryModel.GetEmailsByCategory();
                 ViewData["CategoryData"] = Newtonsoft.Json.JsonConvert.SerializeObject(categoryDataList);
 
+
                 // Instancier le modèle ErrorModel
                 ErrorModel errorModel = new ErrorModel();
                 var errorData = errorModel.GetEmailsByEmailError();
                 ViewData["ErrorData"] = Newtonsoft.Json.JsonConvert.SerializeObject(errorData);
 
-                // Instancier le modèle StatusModel
+                // Instancier le modèle statusModel
                 StatusModel statusModel = new StatusModel();
                 var statusData = statusModel.GetEmailsAverageByStatus();
                 ViewData["StatusData"] = Newtonsoft.Json.JsonConvert.SerializeObject(statusData);
+
+                // Instancier le modèle statusModel
+                //  TimeOfDayModel timeOfDayModel = new TimeOfDayModel();
+                //var timeOfDayData = timeOfDayModel.GetEmailsByTimeOfDayOpened();
+                // ViewData["timeOfDayData"] = Newtonsoft.Json.JsonConvert.SerializeObject(timeOfDayData);
+
+
+
 
                 return View();
             }
@@ -47,12 +70,9 @@ namespace DashboardBI.Controllers
             }
         }
 
-        public JsonResult UpdateGenderChart(string genderFilter)
-        {
-            GenderModel genderModel = new GenderModel();
-            List<GenderModel.GenderData> genderDataList = genderModel.GetEmailsByGender(genderFilter);
-            return Json(genderDataList, JsonRequestBehavior.AllowGet);
-        }
+
+
+
     }
 }
 
